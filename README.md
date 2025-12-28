@@ -32,6 +32,7 @@ A production-ready NestJS starter template with authentication, user management,
   - Modular architecture
 
 - ✅ **DevOps**
+  - Docker & Docker Compose setup
   - Health check endpoint
   - Environment configuration
   - Database seeding
@@ -50,9 +51,14 @@ A production-ready NestJS starter template with authentication, user management,
 
 ## Prerequisites
 
+**Option 1: Local Development**
 - Node.js >= 20.x
 - PostgreSQL >= 14.x
 - npm or yarn
+
+**Option 2: Docker (Recommended)**
+- Docker >= 20.x
+- Docker Compose >= 2.x
 
 ## Getting Started
 
@@ -93,6 +99,7 @@ NODE_ENV=development
 
 ### 4. Database Setup
 
+**Without Docker:**
 ```bash
 # Run migrations and generate Prisma client
 npm run db:setup
@@ -102,6 +109,19 @@ npm run prisma:migrate    # Run migrations
 npm run prisma:generate   # Generate Prisma client
 
 # Seed the database
+npm run db:seed
+```
+
+**With Docker:**
+```bash
+# Start PostgreSQL only (for local development)
+docker-compose -f docker-compose.dev.yml up -d
+
+# Or start everything (app + database)
+docker-compose up -d
+
+# Run migrations and seed
+npm run db:setup
 npm run db:seed
 ```
 
@@ -119,6 +139,63 @@ The API will be available at:
 - API: `http://localhost:3000/api`
 - Swagger: `http://localhost:3000/swagger`
 - Health Check: `http://localhost:3000/api/health`
+
+## Docker Setup
+
+### Quick Start with Docker
+
+**Option 1: Full Stack (App + Database)**
+```bash
+# Start everything
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop everything
+docker-compose down
+```
+
+**Option 2: Database Only (for local development)**
+```bash
+# Start only PostgreSQL
+docker-compose -f docker-compose.dev.yml up -d
+
+# Use local Node.js app with Docker database
+npm run start:dev
+```
+
+### Docker Commands
+
+```bash
+# Start services
+npm run docker:up          # Start all services
+npm run docker:dev        # Start only PostgreSQL
+
+# Stop services
+npm run docker:down       # Stop all services
+
+# View logs
+npm run docker:logs       # View all logs
+docker-compose logs -f app    # View app logs only
+docker-compose logs -f postgres  # View database logs only
+
+# Rebuild containers
+docker-compose build --no-cache
+
+# Access database
+docker-compose exec postgres psql -U postgres -d nestjs_starter_db
+```
+
+### Environment Variables for Docker
+
+Create a `.env` file (or use environment variables):
+
+```env
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRES_IN=3600
+CORS_ORIGIN=*
+```
 
 ## Default Credentials
 
@@ -194,8 +271,33 @@ docs: update API documentation
 refactor(auth): simplify token generation logic
 ```
 
+## Quick Start with Make
+
+The project includes a `Makefile` for convenient command shortcuts:
+
+```bash
+make help          # Show all available commands
+make setup         # Complete setup (install + db + seed)
+make dev           # Start development server
+make docker-dev    # Start PostgreSQL only
+make docker-up     # Start all Docker services
+make db-setup      # Setup database
+make test          # Run tests
+make lint-fix      # Fix linting issues
+make format        # Format code
+```
+
 ## Available Scripts
 
+**Using Make (Recommended):**
+```bash
+make help          # Show all commands
+make setup         # Complete project setup
+make dev           # Start development server
+make docker-up     # Start Docker services
+```
+
+**Using npm:**
 ```bash
 # Development
 npm run start:dev      # Start in watch mode
@@ -223,6 +325,12 @@ npm run test:e2e       # Run e2e tests
 # Production
 npm run build          # Build for production
 npm run start:prod     # Start production server
+
+# Docker
+docker-compose up -d   # Start all services (production)
+docker-compose down    # Stop all services
+docker-compose logs -f # View logs
+docker-compose -f docker-compose.dev.yml up -d  # Start only PostgreSQL (dev)
 ```
 
 ## Environment Variables
