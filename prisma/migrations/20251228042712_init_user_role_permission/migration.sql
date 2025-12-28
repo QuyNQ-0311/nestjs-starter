@@ -54,7 +54,8 @@ CREATE TABLE "auth_service_roles" (
 CREATE TABLE "auth_service_permissions" (
     "id" SERIAL NOT NULL,
     "code" TEXT NOT NULL,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

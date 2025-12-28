@@ -53,6 +53,23 @@ export const Errors = {
       statusCode: 403,
     },
   },
+  ROLE: {
+    CODE_EXISTS: {
+      code: 'ROLE_001',
+      message: 'Role code already exists in this platform',
+      statusCode: 409,
+    },
+    NOT_FOUND: {
+      code: 'ROLE_002',
+      message: 'Role not found',
+      statusCode: 404,
+    },
+    INVALID_PERMISSIONS: {
+      code: 'ROLE_003',
+      message: 'One or more permissions not found or inactive',
+      statusCode: 400,
+    },
+  },
   DEFAULT: {
     INTERNAL_ERROR: {
       code: 'ERR_001',

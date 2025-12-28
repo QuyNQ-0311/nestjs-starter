@@ -1,9 +1,9 @@
 export const PLATFORM = { code: 'local', name: 'Local Dev' } as const;
 
 export const PERMISSIONS = [
-  { code: 'CREATE_USER', name: 'Create user' },
-  { code: 'GET_CUSTOMER_TOKEN', name: 'Get customer token' },
-  { code: 'READ_USER', name: 'Read user' },
+  { code: 'CREATE_USER', name: 'Create user', description: 'Create a new user' },
+  { code: 'GET_CUSTOMER_TOKEN', name: 'Get customer token', description: 'Get a customer token' },
+  { code: 'READ_USER', name: 'Read user', description: 'Read a user' },
 ] as const;
 
 export const ROLES = [

@@ -42,16 +42,26 @@ export class UserRepository extends BaseRepository {
     options?: {
       skip?: number;
       take?: number;
+      search?: string;
       orderBy?: Prisma.AuthServiceUserOrderByWithRelationInput;
     },
   ) {
-    const { skip, take, orderBy } = options || {};
+    const { skip, take, search, orderBy } = options || {};
+
+    const where: Prisma.AuthServiceUserWhereInput = {
+      platformId,
+      isActive: true,
+    };
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
+        { phone: { contains: search, mode: Prisma.QueryMode.insensitive } },
+      ];
+    }
 
     return this.prisma.authServiceUser.findMany({
-      where: {
-        platformId,
-        isActive: true,
-      },
+      where,
       include: {
         platform: true,
         userRoles: {
@@ -66,12 +76,21 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async count(platformId: number) {
+  async count(platformId: number, search?: string) {
+    const where: Prisma.AuthServiceUserWhereInput = {
+      platformId,
+      isActive: true,
+    };
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
+        { phone: { contains: search, mode: Prisma.QueryMode.insensitive } },
+      ];
+    }
+
     return this.prisma.authServiceUser.count({
-      where: {
-        platformId,
-        isActive: true,
-      },
+      where,
     });
   }
 

@@ -62,15 +62,16 @@ export class UserService {
     return userWithoutPassword;
   }
 
-  async getUsers(platformId: number, page = 1, limit = 10) {
-    const skip = (page - 1) * limit;
+  async getUsers(platformId: number, page = 1, pageSize = 10, search?: string) {
+    const skip = (page - 1) * pageSize;
 
     const [users, total] = await Promise.all([
       this.userRepository.findMany(platformId, {
         skip,
-        take: limit,
+        take: pageSize,
+        search,
       }),
-      this.userRepository.count(platformId),
+      this.userRepository.count(platformId, search),
     ]);
 
     // Remove sensitive data
@@ -84,8 +85,8 @@ export class UserService {
       meta: {
         total,
         page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
       },
     };
   }
