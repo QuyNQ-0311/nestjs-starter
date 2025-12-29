@@ -1,6 +1,6 @@
 export const UserPermission = {
-  GET_USER: 'user.get',
-  GET_USERS: 'user.list',
-  UPDATE_USER: 'user.update',
-  DELETE_USER: 'user.delete',
+  GET_USER: 'USER.GET',
+  GET_USERS: 'USER.LIST',
+  UPDATE_USER: 'USER.UPDATE',
+  DELETE_USER: 'USER.DELETE',
 } as const;

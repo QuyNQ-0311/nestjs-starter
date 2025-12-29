@@ -1,8 +1,7 @@
 export const PermissionPermission = {
-  GET_PERMISSION: 'permission.get',
-  GET_PERMISSIONS: 'permission.list',
-  CREATE_PERMISSION: 'permission.create',
-  UPDATE_PERMISSION: 'permission.update',
-  DELETE_PERMISSION: 'permission.delete',
+  GET_PERMISSION: 'PERMISSION.GET',
+  GET_PERMISSIONS: 'PERMISSION.LIST',
+  CREATE_PERMISSION: 'PERMISSION.CREATE',
+  UPDATE_PERMISSION: 'PERMISSION.UPDATE',
+  DELETE_PERMISSION: 'PERMISSION.DELETE',
 } as const;
-
