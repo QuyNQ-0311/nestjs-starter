@@ -1,41 +1,52 @@
 import type { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { DEFAULT_ADMIN } from './seed.constants';
+import { DEFAULT_ADMIN, USERS } from './seed.constants';
 
 export async function seedUsers(prisma: PrismaClient, platformId: number) {
-  const passwordHash = await bcrypt.hash(DEFAULT_ADMIN.password, 10);
+  const seededUsers: Array<{ email: string; password: string; role: string }> = [];
 
-  const admin = await prisma.authServiceUser.upsert({
-    where: { platformId_email: { platformId, email: DEFAULT_ADMIN.email } },
-    update: {
-      passwordHash,
-      isActive: true,
-      phone: DEFAULT_ADMIN.phone,
-      avatar: DEFAULT_ADMIN.avatar,
-    },
-    create: {
-      platformId,
-      email: DEFAULT_ADMIN.email,
-      passwordHash,
-      phone: DEFAULT_ADMIN.phone,
-      avatar: DEFAULT_ADMIN.avatar,
-      isActive: true,
-    },
-  });
+  for (const userData of USERS) {
+    const passwordHash = await bcrypt.hash(userData.password, 10);
 
-  const role = await prisma.authServiceRole.findUniqueOrThrow({
-    where: { platformId_code: { platformId, code: DEFAULT_ADMIN.roleCode } },
-    select: { id: true },
-  });
+    const user = await prisma.authServiceUser.upsert({
+      where: { platformId_email: { platformId, email: userData.email } },
+      update: {
+        passwordHash,
+        isActive: true,
+        phone: userData.phone,
+        avatar: userData.avatar,
+      },
+      create: {
+        platformId,
+        email: userData.email,
+        passwordHash,
+        phone: userData.phone,
+        avatar: userData.avatar,
+        isActive: true,
+      },
+    });
 
-  await prisma.authServiceUserRole.upsert({
-    where: { userId_roleId: { userId: admin.id, roleId: role.id } },
-    update: {},
-    create: { userId: admin.id, roleId: role.id },
-  });
+    const role = await prisma.authServiceRole.findUniqueOrThrow({
+      where: { platformId_code: { platformId, code: userData.roleCode } },
+      select: { id: true },
+    });
+
+    await prisma.authServiceUserRole.upsert({
+      where: { userId_roleId: { userId: user.id, roleId: role.id } },
+      update: {},
+      create: { userId: user.id, roleId: role.id },
+    });
+
+    seededUsers.push({
+      email: userData.email,
+      password: userData.password,
+      role: userData.roleCode,
+    });
+  }
 
   return {
     adminEmail: DEFAULT_ADMIN.email,
     adminPassword: DEFAULT_ADMIN.password,
+    users: seededUsers,
   };
 }

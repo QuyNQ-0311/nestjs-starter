@@ -236,12 +236,9 @@ export class AuthService {
       isActive: true,
     });
 
-    const expiresIn = this.configService.get<number>('JWT_EXPIRES_IN', 3600);
-
     return {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
-      expiresIn,
     };
   }
 

@@ -16,10 +16,14 @@ async function main() {
 
   await seedPermissions(prisma);
   await seedRoles(prisma, platform.id);
-  const admin = await seedUsers(prisma, platform.id);
+  const result = await seedUsers(prisma, platform.id);
 
   console.log('Seed done.');
-  console.log(`Admin: ${admin.adminEmail} / ${admin.adminPassword}`);
+  console.log(`\nAdmin: ${result.adminEmail} / ${result.adminPassword}`);
+  console.log('\nAll users:');
+  result.users.forEach((user) => {
+    console.log(`  - ${user.email} / ${user.password} (${user.role})`);
+  });
 }
 
 main()

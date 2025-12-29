@@ -70,6 +70,23 @@ export const Errors = {
       statusCode: 400,
     },
   },
+  PERMISSION: {
+    CODE_EXISTS: {
+      code: 'PERMISSION_001',
+      message: 'Permission code already exists',
+      statusCode: 409,
+    },
+    NOT_FOUND: {
+      code: 'PERMISSION_002',
+      message: 'Permission not found',
+      statusCode: 404,
+    },
+    INSUFFICIENT: {
+      code: 'PERMISSION_003',
+      message: 'Insufficient permissions',
+      statusCode: 403,
+    },
+  },
   DEFAULT: {
     INTERNAL_ERROR: {
       code: 'ERR_001',

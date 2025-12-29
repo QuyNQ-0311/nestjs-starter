@@ -1,53 +1,43 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Permission } from '../../common/constants/permissions';
+import { AuthClaims } from '../../common/decorators/auth-claims.decorator';
+import { GetUser } from '../../common/decorators/current-user.decorator';
+import { Permissions } from '../../common/decorators/permissions.decorator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
-import { JwtAuthGuard } from '../auth-service/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@AuthClaims()
 @ApiBearerAuth('JWT-auth')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('profile')
-  @HttpCode(HttpStatus.OK)
+  @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
-  async getProfile(@CurrentUser() user: { id: number; platformId: number }) {
+  @AuthClaims()
+  async getProfile(@GetUser() user: { id: number; platformId: number }) {
     return this.userService.getProfile(user.id, user.platformId);
   }
 
-  @Patch('profile')
-  @HttpCode(HttpStatus.OK)
+  @Patch('me')
   @ApiOperation({ summary: 'Update current user profile' })
+  @Permissions([Permission.UPDATE_USER])
+  @AuthClaims()
   async updateProfile(
-    @CurrentUser() user: { id: number; platformId: number },
+    @GetUser() user: { id: number; platformId: number },
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.userService.updateProfile(user.id, user.platformId, updateUserDto);
   }
 
   @Get()
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get users list' })
-  async getUsers(
-    @CurrentUser('platformId') platformId: number,
-    @Query() query: PaginationQueryDto,
-  ) {
+  @Permissions([Permission.GET_USERS])
+  @AuthClaims()
+  async getUsers(@GetUser('platformId') platformId: number, @Query() query: PaginationQueryDto) {
     return this.userService.getUsers(
       platformId,
       query.page || 1,
@@ -57,12 +47,13 @@ export class UserController {
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({ name: 'id', type: Number, example: 1 })
+  @Permissions([Permission.GET_USER])
+  @AuthClaims()
   async getUserById(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser('platformId') platformId: number,
+    @GetUser('platformId') platformId: number,
   ) {
     return this.userService.getUserById(id, platformId);
   }
