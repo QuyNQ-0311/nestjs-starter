@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Errors } from '../../common/constants/errors.constant';
 import { BaseException } from '../../common/exceptions/base.exception';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -13,11 +14,7 @@ export class PermissionService {
     const existingPermission = await this.permissionRepository.findByCode(createPermissionDto.code);
 
     if (existingPermission) {
-      throw new BaseException({
-        code: 'PERMISSION_001',
-        message: 'Permission code already exists',
-        statusCode: 409,
-      });
+      throw new BaseException(Errors.PERMISSION.CODE_EXISTS);
     }
 
     return this.permissionRepository.create({
@@ -61,11 +58,7 @@ export class PermissionService {
     const permission = await this.permissionRepository.findById(id);
 
     if (!permission) {
-      throw new BaseException({
-        code: 'PERMISSION_002',
-        message: 'Permission not found',
-        statusCode: 404,
-      });
+      throw new BaseException(Errors.PERMISSION.NOT_FOUND);
     }
 
     return permission;
@@ -75,11 +68,7 @@ export class PermissionService {
     const permission = await this.permissionRepository.findById(id);
 
     if (!permission) {
-      throw new BaseException({
-        code: 'PERMISSION_002',
-        message: 'Permission not found',
-        statusCode: 404,
-      });
+      throw new BaseException(Errors.PERMISSION.NOT_FOUND);
     }
 
     return this.permissionRepository.update(id, {
@@ -94,11 +83,7 @@ export class PermissionService {
     const permission = await this.permissionRepository.findById(id);
 
     if (!permission) {
-      throw new BaseException({
-        code: 'PERMISSION_002',
-        message: 'Permission not found',
-        statusCode: 404,
-      });
+      throw new BaseException(Errors.PERMISSION.NOT_FOUND);
     }
 
     // Soft delete by setting isActive to false

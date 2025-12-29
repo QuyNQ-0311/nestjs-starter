@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -14,15 +12,14 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Permission } from '../../common/constants/permissions';
 import { AuthClaims } from '../../common/decorators/auth-claims.decorator';
-import { GetUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { PermissionQueryDto } from './dto/permission-query.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { PermissionService } from './permission.service';
 
-@ApiTags('Permissions')
-@Controller('permissions')
+@ApiTags('Permission')
+@Controller('permission')
 @AuthClaims()
 @ApiBearerAuth('JWT-auth')
 export class PermissionController {
@@ -79,4 +76,3 @@ export class PermissionController {
     return this.permissionService.remove(id);
   }
 }
-

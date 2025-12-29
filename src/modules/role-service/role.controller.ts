@@ -20,8 +20,8 @@ import { RoleQueryDto } from './dto/role-query.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { RoleService } from './role.service';
 
-@ApiTags('Roles')
-@Controller('roles')
+@ApiTags('Role')
+@Controller('role')
 @AuthClaims()
 @ApiBearerAuth('JWT-auth')
 export class RoleController {

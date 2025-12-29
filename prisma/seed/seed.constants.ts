@@ -11,7 +11,11 @@ export const PERMISSIONS = [
   { code: 'PERMISSION.GET', name: 'Get Permission', description: 'View a single permission' },
   { code: 'PERMISSION.LIST', name: 'List Permissions', description: 'View list of permissions' },
   { code: 'PERMISSION.CREATE', name: 'Create Permission', description: 'Create a new permission' },
-  { code: 'PERMISSION.UPDATE', name: 'Update Permission', description: 'Update an existing permission' },
+  {
+    code: 'PERMISSION.UPDATE',
+    name: 'Update Permission',
+    description: 'Update an existing permission',
+  },
   { code: 'PERMISSION.DELETE', name: 'Delete Permission', description: 'Delete a permission' },
   // User Service Permissions
   { code: 'USER.GET', name: 'Get User', description: 'View a single user' },

@@ -26,9 +26,10 @@ export interface _PrismaMigrations {
 export interface AuthServicePermissions {
   code: string;
   createdAt: Generated<Timestamp>;
+  description: string | null;
   id: Generated<number>;
   isActive: Generated<boolean>;
-  name: string | null;
+  name: string;
   updatedAt: Generated<Timestamp>;
 }
 
@@ -71,11 +72,13 @@ export interface AuthServiceUserRoles {
 }
 
 export interface AuthServiceUsers {
+  avatar: string | null;
   createdAt: Generated<Timestamp>;
   email: string;
   id: Generated<number>;
   isActive: Generated<boolean>;
-  passwordHash: string;
+  password: string;
+  phone: string | null;
   platformId: number;
   updatedAt: Generated<Timestamp>;
 }

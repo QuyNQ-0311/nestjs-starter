@@ -109,7 +109,7 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async create(data: Prisma.AuthServiceUserCreateInput) {
+  async create(data: Prisma.AuthServiceUserUncheckedCreateInput) {
     return this.prisma.authServiceUser.create({
       data,
       include: {

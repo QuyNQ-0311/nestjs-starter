@@ -1,7 +1,4 @@
-import {
-  PermissionServicePermission,
-  PermissionServicePermissionType,
-} from './permission-service';
+import { PermissionServicePermission, PermissionServicePermissionType } from './permission-service';
 import { RoleServicePermission, RoleServicePermissionType } from './role-service';
 import { UserServicePermission, UserServicePermissionType } from './user-service';
 
