@@ -13,13 +13,35 @@ export type RefreshTokenWithUser = Prisma.AuthServiceRefreshTokenGetPayload<{
   };
 }>;
 
+export type UserWithRolesAndPermissions = Prisma.AuthServiceUserGetPayload<{
+  include: {
+    platform: true;
+    userRoles: {
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: {
+                permission: true;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+}>;
+
 @Injectable()
 export class AuthRepository extends BaseRepository {
   constructor(prisma: PrismaService) {
     super(prisma);
   }
 
-  async findUserByEmailAndPlatform(email: string, platformId: number) {
+  async findUserByEmailAndPlatform(
+    email: string,
+    platformId: number,
+  ): Promise<UserWithRolesAndPermissions | null> {
     return this.prisma.authServiceUser.findFirst({
       where: {
         email,
@@ -45,27 +67,12 @@ export class AuthRepository extends BaseRepository {
     });
   }
 
-  async findRefreshTokenByValue(value: string) {
+  async findActiveRefreshTokenByValue(value: string): Promise<RefreshTokenWithUser | null> {
     return this.prisma.authServiceRefreshToken.findFirst({
       where: {
         value,
         isActive: true,
       },
-    });
-  }
-
-  async findRefreshTokensByUserId(userId: number) {
-    return this.prisma.authServiceRefreshToken.findMany({
-      where: {
-        userId,
-        isActive: true,
-      },
-    });
-  }
-
-  async findRefreshTokenWithUser(tokenId: number) {
-    return this.prisma.authServiceRefreshToken.findUnique({
-      where: { id: tokenId },
       include: {
         user: {
           include: {
@@ -89,7 +96,20 @@ export class AuthRepository extends BaseRepository {
     });
   }
 
-  async deactivateRefreshTokensByUserId(userId: number) {
+  async deactivateRefreshTokenByValue(userId: number, value: string) {
+    return this.prisma.authServiceRefreshToken.updateMany({
+      where: {
+        userId,
+        value,
+        isActive: true,
+      },
+      data: {
+        isActive: false,
+      },
+    });
+  }
+
+  async deactivateAllRefreshTokensByUserId(userId: number) {
     return this.prisma.authServiceRefreshToken.updateMany({
       where: {
         userId,
@@ -101,22 +121,9 @@ export class AuthRepository extends BaseRepository {
     });
   }
 
-  async findAllActiveRefreshTokens(): Promise<RefreshTokenWithUser[]> {
-    return this.prisma.authServiceRefreshToken.findMany({
-      where: {
-        isActive: true,
-      },
-      include: {
-        user: {
-          include: {
-            platform: true,
-          },
-        },
-      },
-    });
-  }
-
-  async createUser(data: Prisma.AuthServiceUserUncheckedCreateInput) {
+  async createUser(
+    data: Prisma.AuthServiceUserUncheckedCreateInput,
+  ): Promise<UserWithRolesAndPermissions> {
     return this.prisma.authServiceUser.create({
       data,
       include: {

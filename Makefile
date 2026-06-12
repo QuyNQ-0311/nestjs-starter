@@ -1,4 +1,4 @@
-.PHONY: help install dev build start test test-watch test-cov lint lint-fix format format-check docker-up docker-down docker-logs docker-dev docker-build docker-clean db-setup db-migrate db-seed db-studio db-reset setup clean clean-all
+.PHONY: help install dev build start test test-watch test-cov lint lint-fix format format-check docker-up docker-down docker-logs docker-dev docker-build docker-clean db-setup db-migrate db-seed db-studio db-format db-reset setup clean clean-all
 
 # Default target
 help: ## Show this help message
@@ -75,6 +75,9 @@ db-seed: ## Seed the database
 
 db-studio: ## Open Prisma Studio
 	npm run prisma:studio
+
+db-format: ## Format Prisma schema file
+	npx prisma format
 
 db-reset: ## Reset database (WARNING: deletes all data)
 	npm run prisma:migrate reset

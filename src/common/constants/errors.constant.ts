@@ -35,6 +35,11 @@ export const Errors = {
       message: 'Invalid platform',
       statusCode: 401,
     },
+    REFRESH_TOKEN_EXPIRED: {
+      code: 'AUTH_008',
+      message: 'Refresh token expired',
+      statusCode: 401,
+    },
   },
   USER: {
     NOT_FOUND: {

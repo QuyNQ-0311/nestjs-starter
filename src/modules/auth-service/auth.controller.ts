@@ -34,8 +34,17 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'User logout' })
-  async logout(@CurrentUser('id') userId: number) {
-    await this.authService.logout(userId);
+  async logout(@CurrentUser('id') userId: number, @Body() body: RefreshTokenDto) {
+    await this.authService.logout(userId, body.refreshToken);
+    return null;
+  }
+
+  @Post('logout-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Logout from all devices' })
+  async logoutAll(@CurrentUser('id') userId: number) {
+    await this.authService.logoutAllDevices(userId);
     return null;
   }
 }
