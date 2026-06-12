@@ -3,12 +3,11 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from 'kysely';
+import type { ColumnType } from "kysely";
 
-export type Generated<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S, I | undefined, U>
-    : ColumnType<T, T | undefined, T>;
+export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
@@ -43,17 +42,13 @@ export interface AuthServicePlatforms {
 
 export interface AuthServiceRefreshTokens {
   createdAt: Generated<Timestamp>;
+  expiresAt: Timestamp;
   id: Generated<number>;
   isActive: Generated<boolean>;
   platformId: number;
   updatedAt: Generated<Timestamp>;
   userId: number;
   value: string;
-}
-
-export interface AuthServiceRolePermissions {
-  permissionId: number;
-  roleId: number;
 }
 
 export interface AuthServiceRoles {
@@ -66,9 +61,9 @@ export interface AuthServiceRoles {
   updatedAt: Generated<Timestamp>;
 }
 
-export interface AuthServiceUserRoles {
+export interface AuthServiceRolesPermissions {
+  permissionId: number;
   roleId: number;
-  userId: number;
 }
 
 export interface AuthServiceUsers {
@@ -83,13 +78,18 @@ export interface AuthServiceUsers {
   updatedAt: Generated<Timestamp>;
 }
 
+export interface AuthServiceUsersRoles {
+  roleId: number;
+  userId: number;
+}
+
 export interface DB {
   _PrismaMigrations: _PrismaMigrations;
   authServicePermissions: AuthServicePermissions;
   authServicePlatforms: AuthServicePlatforms;
   authServiceRefreshTokens: AuthServiceRefreshTokens;
-  authServiceRolePermissions: AuthServiceRolePermissions;
   authServiceRoles: AuthServiceRoles;
-  authServiceUserRoles: AuthServiceUserRoles;
+  authServiceRolesPermissions: AuthServiceRolesPermissions;
   authServiceUsers: AuthServiceUsers;
+  authServiceUsersRoles: AuthServiceUsersRoles;
 }

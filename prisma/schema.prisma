@@ -101,7 +101,7 @@ model AuthServiceUserRole {
 
   @@id([userId, roleId])
   @@index([roleId])
-  @@map("auth_service_user_roles")
+  @@map("auth_service_users_roles")
 }
 
 model AuthServiceRolePermission {
@@ -113,5 +113,5 @@ model AuthServiceRolePermission {
 
   @@id([roleId, permissionId])
   @@index([permissionId])
-  @@map("auth_service_role_permissions")
+  @@map("auth_service_roles_permissions")
 }
