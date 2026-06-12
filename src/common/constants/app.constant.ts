@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
   GLOBAL_PREFIX: 'api',
   SWAGGER_PATH: 'swagger',
-  DEFAULT_PORT: 3000,
+  DEFAULT_PORT: 9000,
   DEFAULT_JWT_EXPIRES_IN: 3600,
 } as const;
 
