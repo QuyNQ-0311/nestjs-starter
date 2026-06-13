@@ -67,12 +67,9 @@ export class AuthRepository extends BaseRepository {
     });
   }
 
-  async findActiveRefreshTokenByValue(value: string): Promise<RefreshTokenWithUser | null> {
-    return this.prisma.authServiceRefreshToken.findFirst({
-      where: {
-        value,
-        isActive: true,
-      },
+  async findRefreshTokenByValue(value: string): Promise<RefreshTokenWithUser | null> {
+    return this.prisma.authServiceRefreshToken.findUnique({
+      where: { value },
       include: {
         user: {
           include: {
@@ -93,6 +90,20 @@ export class AuthRepository extends BaseRepository {
     return this.prisma.authServiceRefreshToken.update({
       where: { id },
       data,
+    });
+  }
+
+  async rotateRefreshToken(
+    oldTokenId: number,
+    newToken: Prisma.AuthServiceRefreshTokenUncheckedCreateInput,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.authServiceRefreshToken.update({
+        where: { id: oldTokenId },
+        data: { isActive: false },
+      });
+
+      return tx.authServiceRefreshToken.create({ data: newToken });
     });
   }
 

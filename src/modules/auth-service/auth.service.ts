@@ -108,12 +108,19 @@ export class AuthService {
       throw new BaseException(Errors.AUTH.REFRESH_TOKEN_REQUIRED);
     }
 
-    const matchedToken = await this.authRepository.findActiveRefreshTokenByValue(
+    const matchedToken = await this.authRepository.findRefreshTokenByValue(
       this.hashRefreshToken(refreshToken),
     );
 
     if (!matchedToken || !matchedToken.user.isActive) {
       throw new BaseException(Errors.AUTH.INVALID_REFRESH_TOKEN);
+    }
+
+    if (!matchedToken.isActive) {
+      // Token was already rotated/revoked but is being used again: likely stolen.
+      // Revoke every session for this user to force re-authentication everywhere.
+      await this.authRepository.deactivateAllRefreshTokensByUserId(matchedToken.user.id);
+      throw new BaseException(Errors.AUTH.REFRESH_TOKEN_REUSED);
     }
 
     if (matchedToken.expiresAt < new Date()) {
@@ -133,13 +140,8 @@ export class AuthService {
     const newAccessToken = this.jwtService.sign(payload);
     const newRefreshToken = this.generateRefreshToken();
 
-    // Deactivate old refresh token
-    await this.authRepository.updateRefreshToken(matchedToken.id, {
-      isActive: false,
-    });
-
-    // Create new refresh token
-    await this.authRepository.createRefreshToken({
+    // Atomically deactivate the old refresh token and create the new one
+    await this.authRepository.rotateRefreshToken(matchedToken.id, {
       platformId: matchedToken.user.platformId,
       userId: matchedToken.user.id,
       value: this.hashRefreshToken(newRefreshToken),

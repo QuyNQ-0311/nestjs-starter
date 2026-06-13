@@ -40,6 +40,11 @@ export const Errors = {
       message: 'Refresh token expired',
       statusCode: 401,
     },
+    REFRESH_TOKEN_REUSED: {
+      code: 'AUTH_009',
+      message: 'Refresh token reuse detected, all sessions revoked',
+      statusCode: 401,
+    },
   },
   USER: {
     NOT_FOUND: {
