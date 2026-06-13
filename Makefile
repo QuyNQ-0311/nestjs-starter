@@ -68,7 +68,7 @@ db-setup: ## Run migrations and generate Prisma client
 	npm run db:setup
 
 db-migrate: ## Run database migrations
-	npm run prisma:migrate
+	npm run db:migrate
 
 db-seed: ## Seed the database
 	npm run db:seed
@@ -80,7 +80,7 @@ db-format: ## Format Prisma schema file
 	npx prisma format
 
 db-reset: ## Reset database (WARNING: deletes all data)
-	npm run prisma:migrate reset
+	npx prisma migrate reset
 
 # Setup
 setup: install db-setup db-seed ## Complete project setup (install + db + seed)
