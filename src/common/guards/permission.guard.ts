@@ -39,6 +39,7 @@ export class PermissionGuard implements CanActivate {
           where: {
             role: {
               isActive: true,
+              deletedAt: null,
             },
           },
           include: {
@@ -48,6 +49,7 @@ export class PermissionGuard implements CanActivate {
                   where: {
                     permission: {
                       isActive: true,
+                      deletedAt: null,
                     },
                   },
                   include: {
@@ -61,7 +63,11 @@ export class PermissionGuard implements CanActivate {
       },
     });
 
-    if (!userWithPermissions || !userWithPermissions.isActive) {
+    if (!userWithPermissions || userWithPermissions.deletedAt) {
+      throw new BaseException(Errors.AUTH.USER_NOT_FOUND);
+    }
+
+    if (!userWithPermissions.isActive) {
       throw new BaseException(Errors.AUTH.USER_INACTIVE);
     }
 

@@ -3,12 +3,11 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from 'kysely';
+import type { ColumnType } from "kysely";
 
-export type Generated<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S, I | undefined, U>
-    : ColumnType<T, T | undefined, T>;
+export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
@@ -26,6 +25,7 @@ export interface _PrismaMigrations {
 export interface AuthServicePermissions {
   code: string;
   createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
   description: string | null;
   id: Generated<number>;
   isActive: Generated<boolean>;
@@ -55,6 +55,7 @@ export interface AuthServiceRefreshTokens {
 export interface AuthServiceRoles {
   code: string;
   createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
   id: Generated<number>;
   isActive: Generated<boolean>;
   name: string;
@@ -70,6 +71,7 @@ export interface AuthServiceRolesPermissions {
 export interface AuthServiceUsers {
   avatar: string | null;
   createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
   email: string;
   id: Generated<number>;
   isActive: Generated<boolean>;

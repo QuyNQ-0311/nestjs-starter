@@ -38,7 +38,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       include: { platform: true },
     });
 
-    if (!user) {
+    if (!user || user.deletedAt) {
       throw new BaseException(Errors.AUTH.USER_NOT_FOUND);
     }
 

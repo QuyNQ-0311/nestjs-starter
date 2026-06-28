@@ -14,7 +14,7 @@ export class UserRepository extends BaseRepository {
       where: {
         id,
         platformId,
-        isActive: true,
+        deletedAt: null,
       },
       include: {
         platform: true,
@@ -32,7 +32,7 @@ export class UserRepository extends BaseRepository {
       where: {
         email,
         platformId,
-        isActive: true,
+        deletedAt: null,
       },
     });
   }
@@ -50,7 +50,7 @@ export class UserRepository extends BaseRepository {
 
     const where: Prisma.AuthServiceUserWhereInput = {
       platformId,
-      isActive: true,
+      deletedAt: null,
     };
 
     if (search) {
@@ -79,7 +79,7 @@ export class UserRepository extends BaseRepository {
   async count(platformId: number, search?: string) {
     const where: Prisma.AuthServiceUserWhereInput = {
       platformId,
-      isActive: true,
+      deletedAt: null,
     };
 
     if (search) {

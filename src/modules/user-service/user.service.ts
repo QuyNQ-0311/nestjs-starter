@@ -137,7 +137,7 @@ export class UserService {
     }
 
     return this.userRepository.update(id, {
-      isActive: false,
+      deletedAt: new Date(),
     });
   }
 }

@@ -10,8 +10,8 @@ export class PermissionRepository extends BaseRepository {
   }
 
   async findById(id: number) {
-    return this.prisma.authServicePermission.findUnique({
-      where: { id },
+    return this.prisma.authServicePermission.findFirst({
+      where: { id, deletedAt: null },
       include: {
         rolePermissions: {
           select: {
@@ -23,8 +23,8 @@ export class PermissionRepository extends BaseRepository {
   }
 
   async findByCode(code: string) {
-    return this.prisma.authServicePermission.findUnique({
-      where: { code },
+    return this.prisma.authServicePermission.findFirst({
+      where: { code, deletedAt: null },
     });
   }
 
@@ -38,6 +38,7 @@ export class PermissionRepository extends BaseRepository {
     const { skip, take, search, where, orderBy } = options || {};
 
     const whereClause: Prisma.AuthServicePermissionWhereInput = {
+      deletedAt: null,
       ...where,
     };
 
@@ -65,6 +66,7 @@ export class PermissionRepository extends BaseRepository {
 
   async count(where?: Prisma.AuthServicePermissionWhereInput, search?: string) {
     const whereClause: Prisma.AuthServicePermissionWhereInput = {
+      deletedAt: null,
       ...where,
     };
 

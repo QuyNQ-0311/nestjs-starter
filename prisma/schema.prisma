@@ -22,15 +22,16 @@ model AuthServicePlatform {
 }
 
 model AuthServiceUser {
-  id           Int      @id @default(autoincrement())
-  platformId   Int      @map("platform_id")
+  id           Int       @id @default(autoincrement())
+  platformId   Int       @map("platform_id")
   email        String
-  passwordHash String   @map("password")
+  passwordHash String    @map("password")
   phone        String?
   avatar       String?
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
 
   platform      AuthServicePlatform       @relation(fields: [platformId], references: [id])
   refreshTokens AuthServiceRefreshToken[]
@@ -61,13 +62,14 @@ model AuthServiceRefreshToken {
 }
 
 model AuthServiceRole {
-  id         Int      @id @default(autoincrement())
-  platformId Int      @map("platform_id")
+  id         Int       @id @default(autoincrement())
+  platformId Int       @map("platform_id")
   code       String
   name       String
-  isActive   Boolean  @default(true) @map("is_active")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  isActive   Boolean   @default(true) @map("is_active")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
 
   platform        AuthServicePlatform         @relation(fields: [platformId], references: [id])
   userRoles       AuthServiceUserRole[]
@@ -79,13 +81,14 @@ model AuthServiceRole {
 }
 
 model AuthServicePermission {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
   name        String
   description String?
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
 
   rolePermissions AuthServiceRolePermission[]
 

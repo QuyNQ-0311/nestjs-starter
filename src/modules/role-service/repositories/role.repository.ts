@@ -14,6 +14,7 @@ export class RoleRepository extends BaseRepository {
       where: {
         id,
         platformId,
+        deletedAt: null,
       },
       include: {
         platform: true,
@@ -33,12 +34,11 @@ export class RoleRepository extends BaseRepository {
   }
 
   async findByCode(code: string, platformId: number) {
-    return this.prisma.authServiceRole.findUnique({
+    return this.prisma.authServiceRole.findFirst({
       where: {
-        platformId_code: {
-          platformId,
-          code,
-        },
+        platformId,
+        code,
+        deletedAt: null,
       },
     });
   }
@@ -57,6 +57,7 @@ export class RoleRepository extends BaseRepository {
 
     const whereClause: Prisma.AuthServiceRoleWhereInput = {
       platformId,
+      deletedAt: null,
       ...where,
     };
 
@@ -99,6 +100,7 @@ export class RoleRepository extends BaseRepository {
   async count(platformId: number, where?: Prisma.AuthServiceRoleWhereInput, search?: string) {
     const whereClause: Prisma.AuthServiceRoleWhereInput = {
       platformId,
+      deletedAt: null,
       ...where,
     };
 

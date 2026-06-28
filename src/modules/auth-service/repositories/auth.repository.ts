@@ -47,6 +47,7 @@ export class AuthRepository extends BaseRepository {
         email,
         platformId,
         isActive: true,
+        deletedAt: null,
       },
       include: {
         platform: true,

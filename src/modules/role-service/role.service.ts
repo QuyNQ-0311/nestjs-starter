@@ -101,9 +101,8 @@ export class RoleService {
       throw new BaseException(Errors.ROLE.NOT_FOUND);
     }
 
-    // Soft delete by setting isActive to false
     return this.roleRepository.update(id, platformId, {
-      isActive: false,
+      deletedAt: new Date(),
     });
   }
 

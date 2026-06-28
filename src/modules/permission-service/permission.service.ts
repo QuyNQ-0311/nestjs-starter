@@ -86,9 +86,8 @@ export class PermissionService {
       throw new BaseException(Errors.PERMISSION.NOT_FOUND);
     }
 
-    // Soft delete by setting isActive to false
     return this.permissionRepository.update(id, {
-      isActive: false,
+      deletedAt: new Date(),
     });
   }
 }
