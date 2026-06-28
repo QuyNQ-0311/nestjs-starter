@@ -49,7 +49,7 @@ export class CloudinaryService {
     if (options) {
       Object.assign(urlOptions, options);
     }
-    const url = cloudinary.url(publicId, urlOptions as TransformationOptions);
+    const url = cloudinary.url(publicId, urlOptions);
     return url ?? '';
   }
 

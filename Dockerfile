@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -15,13 +15,13 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 
 # Generate Prisma client
-RUN npm run prisma:generate
+RUN npm run db:generate
 
 # Build application
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
