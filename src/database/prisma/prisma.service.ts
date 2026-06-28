@@ -1,11 +1,17 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { cyan } from 'colorette';
 import { Pool } from 'pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient<Prisma.PrismaClientOptions, 'query'>
+  implements OnModuleInit, OnModuleDestroy
+{
+  private readonly logger = new Logger('Prisma');
+
   constructor(private configService: ConfigService) {
     const databaseUrl = configService.get<string>('database.url');
 
@@ -19,7 +25,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
     const adapter = new PrismaPg(pool);
 
-    super({ adapter });
+    super({ adapter, log: [{ emit: 'event', level: 'query' }] });
+
+    this.$on('query', (event) => {
+      this.logger.debug(cyan(`${event.query} ${event.params} +${event.duration}ms`));
+    });
   }
 
   async onModuleInit() {

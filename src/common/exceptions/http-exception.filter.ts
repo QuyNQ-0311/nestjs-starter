@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { Errors } from '../constants/errors.constant';
 import { BaseException } from './base.exception';
 
 @Catch()
@@ -7,11 +8,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
-    let code = 'ERR_001';
+    let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message: string = Errors.DEFAULT.INTERNAL_ERROR.message;
+    let code: string = Errors.DEFAULT.INTERNAL_ERROR.code;
 
     if (exception instanceof BaseException) {
       status = exception.statusCode;
@@ -23,10 +23,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
       } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        message =
-          'message' in exceptionResponse && typeof exceptionResponse.message === 'string'
-            ? exceptionResponse.message
-            : exception.message;
+        const responseMessage = (exceptionResponse as { message?: unknown }).message;
+        if (Array.isArray(responseMessage) && typeof responseMessage[0] === 'string') {
+          message = responseMessage[0];
+        } else if (typeof responseMessage === 'string') {
+          message = responseMessage;
+        } else {
+          message = exception.message;
+        }
       } else {
         message = exception.message;
       }
@@ -37,8 +41,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
       statusCode: status,
       code,
-      timestamp: new Date().toISOString(),
-      path: request.url,
     };
 
     response.status(status).json(errorResponse);

@@ -22,7 +22,6 @@ export class BaseException extends HttpException {
       statusCode: this.statusCode,
       code: this.code,
       message: this.message,
-      timestamp: new Date().toISOString(),
     };
   }
 }

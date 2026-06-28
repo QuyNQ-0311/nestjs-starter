@@ -7,12 +7,14 @@ import { AppModule } from './app.module';
 import { APP_CONFIG, SWAGGER_CONFIG } from './common/constants/app.constant';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { LoggingMiddleware } from './common/middlewares/logging.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const globalPrefix = APP_CONFIG.GLOBAL_PREFIX;
 
+  app.use(new LoggingMiddleware().use);
   app.setGlobalPrefix(globalPrefix);
   app.useGlobalPipes(
     new ValidationPipe({
