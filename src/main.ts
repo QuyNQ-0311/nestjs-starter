@@ -50,7 +50,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(APP_CONFIG.SWAGGER_PATH, app, document);
+  SwaggerModule.setup(APP_CONFIG.SWAGGER_PATH, app, document, {
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+    },
+  });
 
   const port = configService.get<number>('app.port', APP_CONFIG.DEFAULT_PORT);
 

@@ -38,12 +38,7 @@ export class PermissionController {
   @Permissions([Permission.GET_PERMISSIONS])
   @AuthClaims()
   async findAll(@Query() query: PermissionQueryDto) {
-    return this.permissionService.findAll(
-      query.page || 1,
-      query.pageSize || 10,
-      query.isActive,
-      query.search,
-    );
+    return this.permissionService.findAll(query.page, query.pageSize, query.isActive, query.search);
   }
 
   @Get(':id')

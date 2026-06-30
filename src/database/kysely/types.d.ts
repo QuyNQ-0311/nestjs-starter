@@ -75,6 +75,7 @@ export interface AuthServiceUsers {
   email: string;
   id: Generated<number>;
   isActive: Generated<boolean>;
+  lastLoginAt: Timestamp | null;
   password: string;
   phone: string | null;
   platformId: number;

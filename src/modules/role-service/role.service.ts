@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Errors } from '../../common/constants/errors.constant';
 import { BaseException } from '../../common/exceptions/base.exception';
 import { PermissionRepository } from '../permission-service/repositories/permission.repository';
-import { AssignPermissionsDto } from './dto/assign-permissions.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { RoleRepository } from './repositories/role.repository';
@@ -22,14 +21,61 @@ export class RoleService {
       throw new BaseException(Errors.ROLE.CODE_EXISTS);
     }
 
-    return this.roleRepository.create({
+    if (createRoleDto.permissionIds) {
+      await this.validatePermissionIds(createRoleDto.permissionIds);
+    }
+
+    const role = await this.roleRepository.create({
       code: createRoleDto.code,
       name: createRoleDto.name,
       platform: {
         connect: { id: platformId },
       },
       isActive: true,
+      ...(createRoleDto.permissionIds && {
+        rolePermissions: {
+          create: createRoleDto.permissionIds.map((permissionId) => ({
+            permission: { connect: { id: permissionId } },
+          })),
+        },
+      }),
     });
+
+    return this.toRoleResponse(role);
+  }
+
+  private toRoleResponse(role: NonNullable<Awaited<ReturnType<RoleRepository['findById']>>>) {
+    const permissions = role.rolePermissions.map((rolePermission) => ({
+      id: rolePermission.permission.id,
+      code: rolePermission.permission.code,
+      name: rolePermission.permission.name,
+      description: rolePermission.permission.description,
+      isActive: rolePermission.permission.isActive,
+      createdAt: rolePermission.permission.createdAt,
+      updatedAt: rolePermission.permission.updatedAt,
+    }));
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { rolePermissions, deletedAt, ...roleWithoutRolePermissions } = role;
+
+    return { ...roleWithoutRolePermissions, permissions };
+  }
+
+  private async validatePermissionIds(permissionIds: number[]) {
+    if (permissionIds.length === 0) {
+      return;
+    }
+
+    const permissions = await Promise.all(
+      permissionIds.map((permissionId) => this.permissionRepository.findById(permissionId)),
+    );
+
+    const hasInvalidPermission = permissions.some(
+      (permission) => !permission || !permission.isActive,
+    );
+    if (hasInvalidPermission) {
+      throw new BaseException(Errors.ROLE.INVALID_PERMISSIONS);
+    }
   }
 
   async findAll(platformId: number, page = 1, pageSize = 10, isActive?: boolean, search?: string) {
@@ -51,8 +97,8 @@ export class RoleService {
     ]);
 
     return {
-      data: roles,
-      meta: {
+      data: roles.map((role) => this.toRoleResponse(role)),
+      metadata: {
         total,
         page,
         pageSize,
@@ -68,7 +114,7 @@ export class RoleService {
       throw new BaseException(Errors.ROLE.NOT_FOUND);
     }
 
-    return role;
+    return this.toRoleResponse(role);
   }
 
   async update(id: number, platformId: number, updateRoleDto: UpdateRoleDto) {
@@ -87,11 +133,28 @@ export class RoleService {
       }
     }
 
-    return this.roleRepository.update(id, platformId, {
+    // permissionIds === undefined means "not provided, keep existing permissions"
+    // permissionIds === null or [] means "clear all permissions"
+    const permissionIds = updateRoleDto.permissionIds;
+    if (permissionIds !== undefined) {
+      await this.validatePermissionIds(permissionIds ?? []);
+    }
+
+    const updatedRole = await this.roleRepository.update(id, platformId, {
       code: updateRoleDto.code,
       name: updateRoleDto.name,
       isActive: updateRoleDto.isActive,
+      ...(permissionIds !== undefined && {
+        rolePermissions: {
+          deleteMany: {},
+          create: (permissionIds ?? []).map((permissionId) => ({
+            permission: { connect: { id: permissionId } },
+          })),
+        },
+      }),
     });
+
+    return this.toRoleResponse(updatedRole);
   }
 
   async remove(id: number, platformId: number) {
@@ -104,43 +167,5 @@ export class RoleService {
     return this.roleRepository.update(id, platformId, {
       deletedAt: new Date(),
     });
-  }
-
-  async assignPermissions(
-    id: number,
-    platformId: number,
-    assignPermissionsDto: AssignPermissionsDto,
-  ) {
-    const role = await this.roleRepository.findById(id, platformId);
-
-    if (!role) {
-      throw new BaseException(Errors.ROLE.NOT_FOUND);
-    }
-
-    // Validate all permissions exist
-    if (assignPermissionsDto.permissionIds.length > 0) {
-      const permissions = await Promise.all(
-        assignPermissionsDto.permissionIds.map((permissionId) =>
-          this.permissionRepository.findById(permissionId),
-        ),
-      );
-
-      const invalidPermissions = permissions.filter((p) => !p || !p.isActive);
-      if (invalidPermissions.length > 0) {
-        throw new BaseException(Errors.ROLE.INVALID_PERMISSIONS);
-      }
-    }
-
-    return this.roleRepository.assignPermissions(id, assignPermissionsDto.permissionIds);
-  }
-
-  async getRolePermissions(id: number, platformId: number) {
-    const role = await this.roleRepository.findById(id, platformId);
-
-    if (!role) {
-      throw new BaseException(Errors.ROLE.NOT_FOUND);
-    }
-
-    return this.roleRepository.getRolePermissions(id);
   }
 }

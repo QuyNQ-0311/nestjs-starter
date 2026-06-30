@@ -17,12 +17,21 @@ export class PermissionService {
       throw new BaseException(Errors.PERMISSION.CODE_EXISTS);
     }
 
-    return this.permissionRepository.create({
+    const permission = await this.permissionRepository.create({
       code: createPermissionDto.code,
       name: createPermissionDto.name,
       description: createPermissionDto.description,
       isActive: true,
     });
+
+    return this.toPermissionResponse(permission);
+  }
+
+  private toPermissionResponse(permission: Awaited<ReturnType<PermissionRepository['create']>>) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { deletedAt, ...rest } = permission;
+
+    return rest;
   }
 
   async findAll(page = 1, pageSize = 10, isActive?: boolean, search?: string) {
@@ -44,8 +53,8 @@ export class PermissionService {
     ]);
 
     return {
-      data: permissions,
-      meta: {
+      data: permissions.map((permission) => this.toPermissionResponse(permission)),
+      metadata: {
         total,
         page,
         pageSize,
@@ -61,7 +70,17 @@ export class PermissionService {
       throw new BaseException(Errors.PERMISSION.NOT_FOUND);
     }
 
-    return permission;
+    const roles = permission.rolePermissions.map((rolePermission) => ({
+      id: rolePermission.role.id,
+      code: rolePermission.role.code,
+      name: rolePermission.role.name,
+      isActive: rolePermission.role.isActive,
+    }));
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { rolePermissions, deletedAt, ...permissionWithoutRolePermissions } = permission;
+
+    return { ...permissionWithoutRolePermissions, roles };
   }
 
   async update(id: number, updatePermissionDto: UpdatePermissionDto) {
@@ -71,12 +90,14 @@ export class PermissionService {
       throw new BaseException(Errors.PERMISSION.NOT_FOUND);
     }
 
-    return this.permissionRepository.update(id, {
+    const updatedPermission = await this.permissionRepository.update(id, {
       name: updatePermissionDto.name,
       code: updatePermissionDto.code,
       description: updatePermissionDto.description,
       isActive: updatePermissionDto.isActive,
     });
+
+    return this.toPermissionResponse(updatedPermission);
   }
 
   async remove(id: number) {

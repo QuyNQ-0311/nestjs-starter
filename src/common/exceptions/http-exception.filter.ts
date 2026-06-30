@@ -43,6 +43,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       code,
     };
 
+    response.locals.errorMessage = message;
     response.status(status).json(errorResponse);
   }
 }

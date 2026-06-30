@@ -49,12 +49,7 @@ export class UserController {
   @Permissions([Permission.GET_USERS])
   @AuthClaims()
   async getUsers(@GetUser('platformId') platformId: number, @Query() query: PaginationQueryDto) {
-    return this.userService.getUsers(
-      platformId,
-      query.page || 1,
-      query.pageSize || 10,
-      query.search,
-    );
+    return this.userService.getUsers(platformId, query.page, query.pageSize, query.search);
   }
 
   @Get(':id')

@@ -18,6 +18,7 @@ CREATE TABLE "auth_service_users" (
     "phone" TEXT,
     "avatar" TEXT,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "last_login_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP(3),

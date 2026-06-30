@@ -23,12 +23,6 @@ export class RoleRepository extends BaseRepository {
             permission: true,
           },
         },
-        _count: {
-          select: {
-            userRoles: true,
-            rolePermissions: true,
-          },
-        },
       },
     });
   }
@@ -87,12 +81,6 @@ export class RoleRepository extends BaseRepository {
             permission: true,
           },
         },
-        _count: {
-          select: {
-            userRoles: true,
-            rolePermissions: true,
-          },
-        },
       },
     });
   }
@@ -133,12 +121,6 @@ export class RoleRepository extends BaseRepository {
             permission: true,
           },
         },
-        _count: {
-          select: {
-            userRoles: true,
-            rolePermissions: true,
-          },
-        },
       },
     });
   }
@@ -155,63 +137,6 @@ export class RoleRepository extends BaseRepository {
         rolePermissions: {
           include: {
             permission: true,
-          },
-        },
-        _count: {
-          select: {
-            userRoles: true,
-            rolePermissions: true,
-          },
-        },
-      },
-    });
-  }
-
-  async getRolePermissions(roleId: number) {
-    const rolePermissions = await this.prisma.authServiceRolePermission.findMany({
-      where: {
-        roleId,
-      },
-      include: {
-        permission: true,
-      },
-    });
-
-    return rolePermissions.map((rp) => rp.permission);
-  }
-
-  async assignPermissions(roleId: number, permissionIds: number[]) {
-    // Delete existing permissions
-    await this.prisma.authServiceRolePermission.deleteMany({
-      where: {
-        roleId,
-      },
-    });
-
-    // Create new permissions
-    if (permissionIds.length > 0) {
-      await this.prisma.authServiceRolePermission.createMany({
-        data: permissionIds.map((permissionId) => ({
-          roleId,
-          permissionId,
-        })),
-      });
-    }
-
-    // Return updated role with permissions
-    return this.prisma.authServiceRole.findUnique({
-      where: { id: roleId },
-      include: {
-        platform: true,
-        rolePermissions: {
-          include: {
-            permission: true,
-          },
-        },
-        _count: {
-          select: {
-            userRoles: true,
-            rolePermissions: true,
           },
         },
       },

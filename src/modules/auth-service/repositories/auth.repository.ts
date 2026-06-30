@@ -165,4 +165,11 @@ export class AuthRepository extends BaseRepository {
       },
     });
   }
+
+  async updateLastLoginAt(userId: number) {
+    return this.prisma.authServiceUser.update({
+      where: { id: userId },
+      data: { lastLoginAt: new Date() },
+    });
+  }
 }

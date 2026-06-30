@@ -14,7 +14,6 @@ import { Permission } from '../../common/constants/permissions';
 import { AuthClaims } from '../../common/decorators/auth-claims.decorator';
 import { GetUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
-import { AssignPermissionsDto } from './dto/assign-permissions.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RoleQueryDto } from './dto/role-query.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -42,8 +41,8 @@ export class RoleController {
   async findAll(@GetUser('platformId') platformId: number, @Query() query: RoleQueryDto) {
     return this.roleService.findAll(
       platformId,
-      query.page || 1,
-      query.pageSize || 10,
+      query.page,
+      query.pageSize,
       query.isActive,
       query.search,
     );
@@ -78,30 +77,5 @@ export class RoleController {
   @AuthClaims()
   async remove(@Param('id', ParseIntPipe) id: number, @GetUser('platformId') platformId: number) {
     return this.roleService.remove(id, platformId);
-  }
-
-  @Post(':id/permissions')
-  @ApiOperation({ summary: 'Assign permissions to role' })
-  @ApiParam({ name: 'id', type: Number, example: 1 })
-  @Permissions([Permission.UPDATE_ROLE])
-  @AuthClaims()
-  async assignPermissions(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUser('platformId') platformId: number,
-    @Body() assignPermissionsDto: AssignPermissionsDto,
-  ) {
-    return this.roleService.assignPermissions(id, platformId, assignPermissionsDto);
-  }
-
-  @Get(':id/permissions')
-  @ApiOperation({ summary: 'Get role permissions' })
-  @ApiParam({ name: 'id', type: Number, example: 1 })
-  @Permissions([Permission.GET_ROLE])
-  @AuthClaims()
-  async getRolePermissions(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUser('platformId') platformId: number,
-  ) {
-    return this.roleService.getRolePermissions(id, platformId);
   }
 }

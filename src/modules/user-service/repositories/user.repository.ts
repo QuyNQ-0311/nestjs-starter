@@ -20,7 +20,15 @@ export class UserRepository extends BaseRepository {
         platform: true,
         userRoles: {
           include: {
-            role: true,
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

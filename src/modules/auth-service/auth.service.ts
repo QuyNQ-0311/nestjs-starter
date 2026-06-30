@@ -53,13 +53,16 @@ export class AuthService {
     const refreshToken = this.generateRefreshToken();
 
     // Save refresh token to database
-    await this.authRepository.createRefreshToken({
-      platformId,
-      userId: user.id,
-      value: this.hashRefreshToken(refreshToken),
-      isActive: true,
-      expiresAt: this.getRefreshTokenExpiresAt(),
-    });
+    await Promise.all([
+      this.authRepository.createRefreshToken({
+        platformId,
+        userId: user.id,
+        value: this.hashRefreshToken(refreshToken),
+        isActive: true,
+        expiresAt: this.getRefreshTokenExpiresAt(),
+      }),
+      this.authRepository.updateLastLoginAt(user.id),
+    ]);
 
     return this.buildAuthResponse(user, accessToken, refreshToken);
   }
@@ -92,13 +95,16 @@ export class AuthService {
     const refreshToken = this.generateRefreshToken();
 
     // Save refresh token to database
-    await this.authRepository.createRefreshToken({
-      platformId,
-      userId: user.id,
-      value: this.hashRefreshToken(refreshToken),
-      isActive: true,
-      expiresAt: this.getRefreshTokenExpiresAt(),
-    });
+    await Promise.all([
+      this.authRepository.createRefreshToken({
+        platformId,
+        userId: user.id,
+        value: this.hashRefreshToken(refreshToken),
+        isActive: true,
+        expiresAt: this.getRefreshTokenExpiresAt(),
+      }),
+      this.authRepository.updateLastLoginAt(user.id),
+    ]);
 
     return this.buildAuthResponse(user, accessToken, refreshToken);
   }

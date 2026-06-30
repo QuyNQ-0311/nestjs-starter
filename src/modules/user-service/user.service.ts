@@ -17,11 +17,7 @@ export class UserService {
       throw new BaseException(Errors.USER.NOT_FOUND);
     }
 
-    // Remove sensitive data
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
+    return this.toProfileResponse(user);
   }
 
   async updateMyProfile(userId: number, platformId: number, updateUserDto: UpdateUserDto) {
@@ -55,10 +51,7 @@ export class UserService {
       throw new BaseException(Errors.USER.NOT_FOUND);
     }
 
-    // Remove sensitive data
-    const { ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
+    return this.toProfileResponse(user);
   }
 
   async getUsers(platformId: number, page = 1, pageSize = 10, search?: string) {
@@ -76,12 +69,12 @@ export class UserService {
     // Remove sensitive data
     const usersWithoutPassword = users.map(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({ passwordHash, ...user }) => user,
+      ({ passwordHash, deletedAt, userRoles, ...user }) => user,
     );
 
     return {
       data: usersWithoutPassword,
-      meta: {
+      metadata: {
         total,
         page,
         pageSize,
@@ -139,5 +132,33 @@ export class UserService {
     return this.userRepository.update(id, {
       deletedAt: new Date(),
     });
+  }
+
+  private toProfileResponse(user: NonNullable<Awaited<ReturnType<UserRepository['findById']>>>) {
+    const roles = user.userRoles.map((userRole) => ({
+      id: userRole.role.id,
+      code: userRole.role.code,
+      name: userRole.role.name,
+      isActive: userRole.role.isActive,
+    }));
+
+    const permissionsMap = new Map<string, { id: number; code: string; name: string | null }>();
+    for (const userRole of user.userRoles) {
+      for (const rolePermission of userRole.role.rolePermissions) {
+        if (rolePermission.permission.isActive) {
+          permissionsMap.set(rolePermission.permission.code, {
+            id: rolePermission.permission.id,
+            code: rolePermission.permission.code,
+            name: rolePermission.permission.name,
+          });
+        }
+      }
+    }
+
+    // Remove sensitive data
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, deletedAt, userRoles, ...userWithoutPassword } = user;
+
+    return { ...userWithoutPassword, roles, permissions: Array.from(permissionsMap.values()) };
   }
 }

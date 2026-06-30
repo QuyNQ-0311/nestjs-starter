@@ -92,13 +92,6 @@ export class PermissionRepository extends BaseRepository {
   async create(data: Prisma.AuthServicePermissionCreateInput) {
     return this.prisma.authServicePermission.create({
       data,
-      include: {
-        _count: {
-          select: {
-            rolePermissions: true,
-          },
-        },
-      },
     });
   }
 
@@ -106,13 +99,6 @@ export class PermissionRepository extends BaseRepository {
     return this.prisma.authServicePermission.update({
       where: { id },
       data,
-      include: {
-        _count: {
-          select: {
-            rolePermissions: true,
-          },
-        },
-      },
     });
   }
 
