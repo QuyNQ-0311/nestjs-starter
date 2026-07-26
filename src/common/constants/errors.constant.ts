@@ -62,6 +62,11 @@ export const Errors = {
       message: 'Unauthorized to access this resource',
       statusCode: 403,
     },
+    INVALID_ROLES: {
+      code: 'USER_004',
+      message: 'One or more roles not found or inactive',
+      statusCode: 400,
+    },
   },
   ROLE: {
     CODE_EXISTS: {

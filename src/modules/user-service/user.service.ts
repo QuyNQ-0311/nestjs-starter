@@ -84,7 +84,7 @@ export class UserService {
   }
 
   async createUser(platformId: number, createUserDto: CreateUserDto) {
-    const { email, phone, avatar, password } = createUserDto;
+    const { email, phone, avatar, password, roleIds } = createUserDto;
 
     const existingUser = await this.userRepository.findByEmail(email, platformId);
 
@@ -92,9 +92,20 @@ export class UserService {
       throw new BaseException(Errors.USER.EMAIL_EXISTS);
     }
 
+    if (roleIds?.length) {
+      await this.validateRoleIds(roleIds, platformId);
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
-    return this.userRepository.create({ platformId, email, phone, avatar, passwordHash });
+    return this.userRepository.create({
+      platformId,
+      email,
+      phone,
+      avatar,
+      passwordHash,
+      userRoles: roleIds?.length ? { create: roleIds.map((id) => ({ roleId: id })) } : undefined,
+    });
   }
 
   async updateUser(userId: number, platformId: number, updateUserDto: UpdateUserDto) {
@@ -104,7 +115,6 @@ export class UserService {
       throw new BaseException(Errors.USER.NOT_FOUND);
     }
 
-    // Check if email already exists for another user
     if (updateUserDto.email && updateUserDto.email !== user.email) {
       const existingUser = await this.userRepository.findByEmail(updateUserDto.email, platformId);
 
@@ -113,9 +123,24 @@ export class UserService {
       }
     }
 
-    const updatedUser = await this.userRepository.update(userId, updateUserDto);
+    const { roleIds, ...rest } = updateUserDto;
 
-    // Remove sensitive data
+    let userRolesUpdate: { deleteMany: object; create: { roleId: number }[] } | undefined;
+    if (roleIds !== undefined) {
+      if (roleIds !== null && roleIds.length > 0) {
+        await this.validateRoleIds(roleIds, platformId);
+      }
+      userRolesUpdate = {
+        deleteMany: {},
+        create: roleIds?.map((id) => ({ roleId: id })) ?? [],
+      };
+    }
+
+    const updatedUser = await this.userRepository.update(userId, {
+      ...rest,
+      ...(userRolesUpdate !== undefined ? { userRoles: userRolesUpdate } : {}),
+    });
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userWithoutPassword } = updatedUser;
 
@@ -132,6 +157,13 @@ export class UserService {
     return this.userRepository.update(id, {
       deletedAt: new Date(),
     });
+  }
+
+  private async validateRoleIds(roleIds: number[], platformId: number) {
+    const found = await this.userRepository.findRolesByIds(roleIds, platformId);
+    if (found.length !== roleIds.length) {
+      throw new BaseException(Errors.USER.INVALID_ROLES);
+    }
   }
 
   private toProfileResponse(user: NonNullable<Awaited<ReturnType<UserRepository['findById']>>>) {

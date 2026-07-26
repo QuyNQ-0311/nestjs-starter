@@ -102,6 +102,12 @@ export class UserRepository extends BaseRepository {
     });
   }
 
+  async findRolesByIds(roleIds: number[], platformId: number) {
+    return this.prisma.authServiceRole.findMany({
+      where: { id: { in: roleIds }, platformId, isActive: true, deletedAt: null },
+    });
+  }
+
   async update(id: number, data: Prisma.AuthServiceUserUpdateInput) {
     return this.prisma.authServiceUser.update({
       where: { id },
