@@ -14,7 +14,8 @@ RUN npm ci --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client (DATABASE_URL is only validated, not connected to, by `prisma generate`)
+ENV DATABASE_URL="postgresql://user:password@localhost:5432/db"
 RUN npm run db:generate
 
 # Build application
@@ -30,7 +31,7 @@ COPY package*.json ./
 COPY prisma.config.ts ./
 COPY prisma ./prisma
 
-RUN npm ci --only=production --legacy-peer-deps && \
+RUN npm ci --omit=dev --legacy-peer-deps && \
     npm cache clean --force
 
 # Copy built application
